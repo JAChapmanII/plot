@@ -160,3 +160,7 @@ double getPlotResolution() {
 }
 /* }}} */
 
+void plotDelay(int time) {
+	SDL_Delay(time);
+}
+

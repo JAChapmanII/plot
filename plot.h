@@ -19,4 +19,6 @@ int getPlotHeight();
 void setPlotResolution(double pResolution);
 double getPlotResolution();
 
+void plotDelay(int time);
+
 #endif /* PLOT_H */
