@@ -93,7 +93,7 @@ int plot_CheckState() {
 	}
 }
 
-void plot_yOfX(fYofX f, Interval i) {
+void plot_fY_X(fYofX f, Interval i) {
 	double x = i.start, y, ilen = i.start - i.end, min = 999, max = -999, ylen;
 	if(plot_CheckState() != 0)
 		return;
