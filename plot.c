@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <GL/gl.h>
 
+/* TODO: change? */
 #define MIN_PLOT_RESOLUTION 0.0000001
 
 int plot_Width = 800;
@@ -14,6 +15,7 @@ enum PlotState { PS_NINIT, PS_NRSIZE, PS_GOOD, PS_FAIL } plot_State;
 
 SDL_Surface *plot_Screen;
 
+/* TODO: less exit-y */
 int plot_Init() {
 	const SDL_VideoInfo *videoInfo;
 	int videoFlags;
@@ -32,7 +34,7 @@ int plot_Init() {
 	videoFlags = SDL_OPENGL;
 	videoFlags |= SDL_GL_DOUBLEBUFFER;
 	videoFlags |= SDL_HWPALETTE;
-	/*videoFlags |= SDL_RESIZABLE;*/
+	/*videoFlags |= SDL_RESIZABLE; TODO */
 
 	if(videoInfo->hw_available)
 		videoFlags |= SDL_HWSURFACE;
@@ -51,12 +53,7 @@ int plot_Init() {
 	}
 
 	/* initialize OpenGL */
-	glShadeModel(GL_SMOOTH);
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	if(plot_Resize() != 0)
 		return 1;
@@ -64,6 +61,7 @@ int plot_Init() {
 	return 0;
 }
 
+/* TODO change this to have 0,0 in the center? */
 int plot_Resize() {
 	double ratio = plot_Width / plot_Height;
 
@@ -93,6 +91,8 @@ int plot_CheckState() {
 	}
 }
 
+/* TODO a lot of this will be needed for all the plot_f* functions, so we
+ * should try to get this split up better */
 void plot_fY_X(fYofX f, Interval i) {
 	double x = i.start, y, ilen = i.start - i.end, min = 999, max = -999, ylen;
 	if(plot_CheckState() != 0)
@@ -118,6 +118,7 @@ void plot_fY_X(fYofX f, Interval i) {
 	/* draw axes */
 	glColor3f(0.2f, 0.2f, 0.8f);
 	glBegin(GL_LINES);
+	/* TODO simplify these >_> */
 	glVertex2f((1.0f - (0 + i.start) / ilen) * plot_Width,
 			(min - min) / ylen * plot_Height);
 	glVertex2f((1.0f - (0 + i.start) / ilen) * plot_Width,
@@ -134,6 +135,7 @@ void plot_fY_X(fYofX f, Interval i) {
 	glColor3f(0.0f, 0.0f, 0.0f);
 	while(x < i.end) {
 		y = f(x);
+		/* TODO this addressing thing is horrible */
 		glVertex2f((1.0f - (x + i.start) / ilen) * plot_Width,
 				(y - min) / ylen * plot_Height);
 		x += plot_Resolution;
