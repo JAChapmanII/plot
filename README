@@ -1,0 +1,21 @@
+This is a very simple plotting utility library which uses SDL and OpenGL.
+
+Right now, you can plot a function y of x to a window. Eventually there will
+be image saving as well, along with many other classes of functions. It's
+really just a quick dirty hack at the moment I banged out in an hour waiting
+for class.
+
+Compiling:
+	make
+
+Running:
+	./plot-test
+
+Note: This isn't set up to be compiled as a separate library yet. Still need
+to work on that.
+
+Usage:
+	For now, all you can really do is take a gander at plot.h and plot-test.c
+	and do similar things in your own code. Or go google an actual library
+	instead of this ;) If you do use this, I assume you can work a Makefile.
+
