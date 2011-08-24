@@ -100,26 +100,42 @@ void plot_yOfX(fYofX f, Interval i) {
 
 	while(x < i.end) {
 		y = f(x);
-		printf("f(%f): %f\n", x, y);
+		/*printf("f(%f): %f\n", x, y);*/
 		if(y < min)
 			min = y;
 		else if(y > max)
 			max = y;
 		x += plot_Resolution;
 	}
+	min *= 1.1;
+	max *= 1.1;
 	ylen = max - min;
 	printf("ylen: [%f, %f]\n", min, max);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
+	/* draw axes */
+	glColor3f(0.2f, 0.2f, 0.8f);
+	glBegin(GL_LINES);
+	glVertex2f((1.0f - (0 + i.start) / ilen) * plot_Width,
+			(min - min) / ylen * plot_Height);
+	glVertex2f((1.0f - (0 + i.start) / ilen) * plot_Width,
+			(max - min) / ylen * plot_Height);
+
+	glVertex2f((1.0f - (i.start + i.start) / ilen) * plot_Width,
+			(0 - min) / ylen * plot_Height);
+	glVertex2f((1.0f - (i.end + i.start) / ilen) * plot_Width,
+			(0 - min) / ylen * plot_Height);
+	glEnd();
+
 	x = i.start;
 	glBegin(GL_LINE_STRIP);
 	glColor3f(0.0f, 0.0f, 0.0f);
 	while(x < i.end) {
 		y = f(x);
-		glVertex2f((x + i.start) / ilen * plot_Width,
-				(y + min) / ylen * plot_Height);
+		glVertex2f((1.0f - (x + i.start) / ilen) * plot_Width,
+				(y - min) / ylen * plot_Height);
 		x += plot_Resolution;
 	}
 	glEnd();
