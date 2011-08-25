@@ -13,15 +13,15 @@ int main(int argc, char **argv) {
 
 	setPlotResolution(1);
 	plot_fY_X(&f1, i);
-	plotDelay(3000);
+	plotDelay(1000);
 
 	setPlotResolution(0.5);
 	plot_fY_X(&f1, i);
-	plotDelay(3000);
+	plotDelay(1000);
 
 	setPlotResolution(0.05);
 	plot_fY_X(&f1, i);
-	plotDelay(3000);
+	plotDelay(1000);
 
 	printf("plot dimensions: [%d, %d]\n", getPlotWidth(), getPlotHeight());
 	setPlotWidth(1000);
