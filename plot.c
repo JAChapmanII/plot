@@ -1,5 +1,6 @@
 #include "plot.h"
 #include <stdio.h>
+#include <float.h>
 
 #include <SDL/SDL.h>
 #include <GL/gl.h>
@@ -7,9 +8,17 @@
 /* TODO: change? */
 #define MIN_PLOT_RESOLUTION 0.0000001
 
+/* TODO: handle better? Probably should be relative to window size and
+ * interval size. I mean, do we really need to plot from -11 to 11 for a 
+ * -1 -> 1 window with a resolution of 1? */
+/* We multiply this number by the plot resolution, then graph that much more
+ * off the left and right ends of the x interval */
+#define PLOT_OVERFLOW 10
+
 int plot_Width = 800;
 int plot_Height = 600;
 double plot_Resolution = 1;
+double plot_Overflow = 10;
 
 enum PlotState { PS_NINIT, PS_NRSIZE, PS_GOOD, PS_FAIL } plot_State;
 
@@ -91,56 +100,83 @@ int plot_CheckState() {
 	}
 }
 
-void drawAxes(double minX, double maxX, double minY, double maxY) { /* {{{ */
-	double ilen = maxX - minX, ylen = maxY - minY;
+void drawAxes(Interval xInterval, Interval yInterval) { /* {{{ */
+	double xLen = xInterval.end - xInterval.start,
+			yLen = yInterval.end - yInterval.start;
 	glColor3f(0.2f, 0.2f, 0.8f);
 	glBegin(GL_LINES);
-	glVertex2f(maxX / ilen * plot_Width, 0);
-	glVertex2f(maxX / ilen * plot_Width, plot_Height);
-	glVertex2f(0, -minY / ylen * plot_Height);
-	glVertex2f(plot_Width, -minY / ylen * plot_Height);
+
+	/* x axis */
+	glVertex2f(xInterval.end / xLen * plot_Width, 0);
+	glVertex2f(xInterval.end / xLen * plot_Width, plot_Height);
+
+	/* y axis */
+	glVertex2f(0, -yInterval.start / yLen * plot_Height);
+	glVertex2f(plot_Width, -yInterval.start / yLen * plot_Height);
+
 	glEnd();
 } /* }}} */
 
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
-void plot_fY_X(fYofX f, Interval i) {
-	double x = i.start, y, ilen = i.end - i.start, min = 999, max = -999, ylen;
+void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval) {
+	double x, y, xLen, yLen, rStart, rEnd;
 	if(plot_CheckState() != 0)
 		return;
-
-	while(x < i.end) {
-		y = f(x);
-		/*printf("f(%.4f): %.16f\n", x, y);*/
-		if(y < min)
-			min = y;
-		else if(y > max)
-			max = y;
-		x += plot_Resolution;
-	}
-	min *= 1.1;
-	max *= 1.1;
-	ylen = max - min;
-	printf("ylen: [%f, %f]\n", min, max);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	drawAxes(i.start, i.end, min, max);
+	rStart = xInterval.start - plot_Overflow;
+	rEnd = xInterval.end + plot_Overflow;
 
-	x = i.start;
+	xLen = xInterval.end - xInterval.start;
+	yLen = yInterval.end - yInterval.start;
+
+	drawAxes(xInterval, yInterval);
+
+	x = rStart;
+
 	glBegin(GL_LINE_STRIP);
 	glColor3f(0.0f, 0.0f, 0.0f);
-	while(x < i.end) {
+	while(x < rEnd) {
 		y = f(x);
-		/* TODO this addressing thing is horrible */
-		glVertex2f((x - i.start) / ilen * plot_Width,
-				(y - min) / ylen * plot_Height);
+		/* TODO could this addressing be better? */
+		glVertex2f((x - xInterval.start) / xLen * plot_Width,
+				(y - yInterval.start) / yLen * plot_Height);
 		x += plot_Resolution;
 	}
 	glEnd();
 	SDL_GL_SwapBuffers();
 }
+
+/* Calculate and return an appropriate yInterval for some function f over a
+ * particular x interval */
+Interval getYInterval_fYofX(fYofX f, Interval xInterval) { /* {{{ */
+	Interval yInterval = { DBL_MAX, -DBL_MAX };
+	double x, y;
+
+	xInterval.start -= plot_Overflow;
+	xInterval.end += plot_Overflow;
+
+	x = xInterval.start;
+	while(x < xInterval.end) {
+		y = f(x);
+		/*printf("f(%.4f): %.16f\n", x, y);*/
+		if(y < yInterval.start)
+			yInterval.start = y;
+		if(y > yInterval.end)
+			yInterval.end = y;
+		x += plot_Resolution;
+	}
+	/* TODO: this expansion fails for 0, and when min = max */
+	yInterval.start *= 1.1;
+	yInterval.end *= 1.1;
+	/*ylen = max - min;
+	printf("ylen: [%f, %f]\n", min, max);*/
+
+	return yInterval;
+} /* }}} */
 
 /* Plot dimension (width, height, resolution setters and getters {{{ */
 void setPlotWidth(int pWidth) {
@@ -170,6 +206,7 @@ void setPlotResolution(double pResolution) {
 	if(pResolution < MIN_PLOT_RESOLUTION)
 		pResolution = MIN_PLOT_RESOLUTION;
 	plot_Resolution = pResolution;
+	plot_Overflow = pResolution * PLOT_OVERFLOW;
 }
 double getPlotResolution() {
 	return plot_Resolution;

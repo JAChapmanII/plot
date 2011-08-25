@@ -7,7 +7,9 @@ typedef struct {
 
 typedef double(*fYofX)(double);
 
-void plot_fY_X(fYofX f, Interval i);
+void plot_fYofX(fYofX f, Interval i, Interval yi);
+
+Interval getYInterval_fYofX(fYofX f, Interval xInterval);
 
 void setPlotWidth(int pWidth);
 void setPlotHeight(int pHeight);
