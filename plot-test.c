@@ -14,7 +14,9 @@ int main(int argc, char **argv) {
 
 	for(; res >= 0.01; res -= 0.01) {
 		setPlotResolution(res);
-		plot_fYofX(&f1, i, yi);
+		clearPlot();
+		drawAxes(i, yi);
+		plot_fYofX(f1, i, yi);
 		plotDelay(50);
 	}
 
