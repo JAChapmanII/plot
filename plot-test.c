@@ -6,26 +6,16 @@ double f1(double x) {
 }
 
 int main(int argc, char **argv) {
-	Interval i = { -5, 5.0001 }, yi = getYInterval_fYofX(&f1, i);
-	double res = 1;
+	Interval xi = { -5, 5 }, yi = getYInterval_fYofX(f1, xi);
+	double res = 3;
 
-	printf("sizeof(double): %d\n", sizeof(double));
-	printf("sizeof(long double): %d\n", sizeof(long double));
-
-	for(; res >= 0.01; res -= 0.01) {
+	for(; res >= 0.01; res -= .01) {
 		setPlotResolution(res);
 		clearPlot();
-		drawAxes(i, yi);
-		plot_fYofX(f1, i, yi);
+		drawAxes(xi, yi);
+		plot_fYofX(f1, xi, yi);
 		plotDelay(50);
 	}
-
-	printf("plot dimensions: [%d, %d]\n", getPlotWidth(), getPlotHeight());
-	setPlotWidth(1000);
-	setPlotHeight(1000);
-	printf("plot dimensions: [%d, %d]\n", getPlotWidth(), getPlotHeight());
-	setPlotDimensions(600, 400);
-	printf("plot dimensions: [%d, %d]\n", getPlotWidth(), getPlotHeight());
 
 	return 0;
 }
