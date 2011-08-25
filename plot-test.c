@@ -6,22 +6,17 @@ double f1(double x) {
 }
 
 int main(int argc, char **argv) {
-	Interval i = { -5, 5.0001 };
+	Interval i = { -5, 5.0001 }, yi = getYInterval_fYofX(&f1, i);
+	double res = 1;
 
 	printf("sizeof(double): %d\n", sizeof(double));
 	printf("sizeof(long double): %d\n", sizeof(long double));
 
-	setPlotResolution(1);
-	plot_fY_X(&f1, i);
-	plotDelay(1000);
-
-	setPlotResolution(0.5);
-	plot_fY_X(&f1, i);
-	plotDelay(1000);
-
-	setPlotResolution(0.05);
-	plot_fY_X(&f1, i);
-	plotDelay(1000);
+	for(; res >= 0.01; res -= 0.01) {
+		setPlotResolution(res);
+		plot_fYofX(&f1, i, yi);
+		plotDelay(50);
+	}
 
 	printf("plot dimensions: [%d, %d]\n", getPlotWidth(), getPlotHeight());
 	setPlotWidth(1000);
