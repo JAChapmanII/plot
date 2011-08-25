@@ -100,6 +100,11 @@ int plot_CheckState() {
 	}
 }
 
+void clearPlot() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+}
+
 void drawAxes(Interval xInterval, Interval yInterval) { /* {{{ */
 	double xLen = xInterval.end - xInterval.start,
 			yLen = yInterval.end - yInterval.start;
@@ -124,16 +129,11 @@ void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval) {
 	if(plot_CheckState() != 0)
 		return;
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
-
 	rStart = xInterval.start - plot_Overflow;
 	rEnd = xInterval.end + plot_Overflow;
 
 	xLen = xInterval.end - xInterval.start;
 	yLen = yInterval.end - yInterval.start;
-
-	drawAxes(xInterval, yInterval);
 
 	x = rStart;
 

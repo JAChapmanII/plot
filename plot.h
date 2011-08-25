@@ -7,7 +7,10 @@ typedef struct {
 
 typedef double(*fYofX)(double);
 
-void plot_fYofX(fYofX f, Interval i, Interval yi);
+void clearPlot();
+void drawAxes(Interval xInterval, Interval yInterval);
+
+void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval);
 
 Interval getYInterval_fYofX(fYofX f, Interval xInterval);
 
