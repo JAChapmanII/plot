@@ -105,7 +105,7 @@ void drawAxes(double minX, double maxX, double minY, double maxY) { /* {{{ */
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
 void plot_fY_X(fYofX f, Interval i) {
-	double x = i.start, y, ilen = i.start - i.end, min = 999, max = -999, ylen;
+	double x = i.start, y, ilen = i.end - i.start, min = 999, max = -999, ylen;
 	if(plot_CheckState() != 0)
 		return;
 
@@ -134,7 +134,7 @@ void plot_fY_X(fYofX f, Interval i) {
 	while(x < i.end) {
 		y = f(x);
 		/* TODO this addressing thing is horrible */
-		glVertex2f((1.0f - (x + i.start) / ilen) * plot_Width,
+		glVertex2f((x - i.start) / ilen * plot_Width,
 				(y - min) / ylen * plot_Height);
 		x += plot_Resolution;
 	}
