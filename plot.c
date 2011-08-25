@@ -91,6 +91,25 @@ int plot_CheckState() {
 	}
 }
 
+void drawAxes(double minX, double maxX, double minY, double maxY) {
+	double ilen = minX - maxX, ylen = maxY - minY;
+	glColor3f(0.2f, 0.2f, 0.8f);
+	glBegin(GL_LINES);
+	/* TODO simplify these >_> */
+	glVertex2f(-maxX / ilen * plot_Width, 0);
+	glVertex2f(-maxX / ilen * plot_Width, plot_Height);
+
+	/*
+	glVertex2f((1.0f - (2*minX / ilen)) * plot_Width,
+			-minY / ylen * plot_Height);
+	glVertex2f((1.0f - (maxX + minX) / ilen) * plot_Width,
+			-minY / ylen * plot_Height);
+			*/
+	glVertex2f(0, -minY / ylen * plot_Height);
+	glVertex2f(plot_Width, -minY / ylen * plot_Height);
+	glEnd();
+}
+
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
 void plot_fY_X(fYofX f, Interval i) {
@@ -100,7 +119,7 @@ void plot_fY_X(fYofX f, Interval i) {
 
 	while(x < i.end) {
 		y = f(x);
-		/*printf("f(%f): %f\n", x, y);*/
+		/*printf("f(%.4f): %.16f\n", x, y);*/
 		if(y < min)
 			min = y;
 		else if(y > max)
@@ -115,20 +134,7 @@ void plot_fY_X(fYofX f, Interval i) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	/* draw axes */
-	glColor3f(0.2f, 0.2f, 0.8f);
-	glBegin(GL_LINES);
-	/* TODO simplify these >_> */
-	glVertex2f((1.0f - (0 + i.start) / ilen) * plot_Width,
-			(min - min) / ylen * plot_Height);
-	glVertex2f((1.0f - (0 + i.start) / ilen) * plot_Width,
-			(max - min) / ylen * plot_Height);
-
-	glVertex2f((1.0f - (i.start + i.start) / ilen) * plot_Width,
-			(0 - min) / ylen * plot_Height);
-	glVertex2f((1.0f - (i.end + i.start) / ilen) * plot_Width,
-			(0 - min) / ylen * plot_Height);
-	glEnd();
+	drawAxes(i.start, i.end, min, max);
 
 	x = i.start;
 	glBegin(GL_LINE_STRIP);
