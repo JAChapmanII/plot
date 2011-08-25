@@ -91,24 +91,16 @@ int plot_CheckState() {
 	}
 }
 
-void drawAxes(double minX, double maxX, double minY, double maxY) {
-	double ilen = minX - maxX, ylen = maxY - minY;
+void drawAxes(double minX, double maxX, double minY, double maxY) { /* {{{ */
+	double ilen = maxX - minX, ylen = maxY - minY;
 	glColor3f(0.2f, 0.2f, 0.8f);
 	glBegin(GL_LINES);
-	/* TODO simplify these >_> */
-	glVertex2f(-maxX / ilen * plot_Width, 0);
-	glVertex2f(-maxX / ilen * plot_Width, plot_Height);
-
-	/*
-	glVertex2f((1.0f - (2*minX / ilen)) * plot_Width,
-			-minY / ylen * plot_Height);
-	glVertex2f((1.0f - (maxX + minX) / ilen) * plot_Width,
-			-minY / ylen * plot_Height);
-			*/
+	glVertex2f(maxX / ilen * plot_Width, 0);
+	glVertex2f(maxX / ilen * plot_Width, plot_Height);
 	glVertex2f(0, -minY / ylen * plot_Height);
 	glVertex2f(plot_Width, -minY / ylen * plot_Height);
 	glEnd();
-}
+} /* }}} */
 
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
