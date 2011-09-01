@@ -270,6 +270,21 @@ void plotDelay(int time) {
 }
 
 void pause() {
-	SDL_Delay(3000);
+	SDL_Event e;
+	while(1) {
+		if(SDL_PollEvent(&e)) {
+			switch(e.type) {
+				case SDL_KEYDOWN:
+					switch(e.key.keysym.sym) {
+						case SDLK_RETURN:
+							return;
+						default:
+							break;
+					}
+				default:
+					break;
+			}
+		}
+	}
 }
 
