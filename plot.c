@@ -19,6 +19,8 @@ int plot_Width = 800;
 int plot_Height = 600;
 double plot_Resolution = 1;
 double plot_Overflow = 10;
+Interval plot_XInterval = { -10, 10 };
+Interval plot_YInterval = { -10, 10 };
 
 enum PlotState { PS_NINIT, PS_NRSIZE, PS_GOOD, PS_FAIL } plot_State;
 
@@ -101,6 +103,9 @@ int plot_CheckState() {
 }
 
 void clearPlot() {
+	if(plot_CheckState() != 0)
+		return;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 }
@@ -129,11 +134,17 @@ void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval) {
 	if(plot_CheckState() != 0)
 		return;
 
-	rStart = xInterval.start - plot_Overflow;
-	rEnd = xInterval.end + plot_Overflow;
-
 	xLen = xInterval.end - xInterval.start;
 	yLen = yInterval.end - yInterval.start;
+
+	/*
+	rStart = (xInterval.start + xLen / 2) - (plot_Resolution / 2) -
+		(xLen / plot_Resolution / 2);
+	rEnd = (xInterval.start + xLen / 2) + (plot_Resolution / 2) +
+		(xLen / plot_Resolution / 2);
+	*/
+	rStart = xInterval.start - plot_Overflow;
+	rEnd = xInterval.end + plot_Overflow;
 
 	x = rStart;
 
@@ -146,6 +157,33 @@ void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval) {
 				(y - yInterval.start) / yLen * plot_Height);
 		x += plot_Resolution;
 	}
+	glEnd();
+	SDL_GL_SwapBuffers();
+}
+
+void drawDot(double x, double y, Interval xInterval, Interval yInterval) {
+	double xLen, yLen;
+	if(plot_CheckState() != 0)
+		return;
+	xLen = xInterval.end - xInterval.start;
+	yLen = yInterval.end - yInterval.start;
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glPointSize(9);
+	glBegin(GL_POINTS);
+	/*glBegin(GL_LINE_STRIP);*/
+		glVertex2f((x - xInterval.start) / xLen * plot_Width,
+				(y - yInterval.start) / yLen * plot_Height);
+		/*
+		glVertex2f((x - 0.02 - xInterval.start) / xLen * plot_Width,
+				(y - yInterval.start) / yLen * plot_Height);
+		glVertex2f((x - xInterval.start) / xLen * plot_Width,
+				(y + 0.02 - yInterval.start) / yLen * plot_Height);
+		glVertex2f((x + 0.02 - xInterval.start) / xLen * plot_Width,
+				(y - yInterval.start) / yLen * plot_Height);
+		glVertex2f((x - xInterval.start) / xLen * plot_Width,
+				(y - 0.02 - yInterval.start) / yLen * plot_Height);
+				*/
 	glEnd();
 	SDL_GL_SwapBuffers();
 }
@@ -192,6 +230,14 @@ void setPlotDimensions(int pWidth, int pHeight) {
 	plot_Width = pWidth;
 	plot_Height = pHeight;
 }
+void setPlotXInterval(double start, double end) {
+	plot_XInterval.start = start;
+	plot_XInterval.start = end;
+}
+void setPlotYInterval(double start, double end) {
+	plot_YInterval.start = start;
+	plot_YInterval.start = end;
+}
 
 int getPlotWidth() {
 	return plot_Width;
@@ -211,9 +257,19 @@ void setPlotResolution(double pResolution) {
 double getPlotResolution() {
 	return plot_Resolution;
 }
+Interval getXInterval() {
+	return plot_XInterval;
+}
+Interval getYInterval() {
+	return plot_YInterval;
+}
 /* }}} */
 
 void plotDelay(int time) {
 	SDL_Delay(time);
+}
+
+void pause() {
+	SDL_Delay(3000);
 }
 
