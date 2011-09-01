@@ -8,6 +8,8 @@
 /* TODO: change? */
 #define MIN_PLOT_RESOLUTION 0.0000001
 
+/* TODO: flip manually or automatically as we are now? */
+
 /* TODO: handle better? Probably should be relative to window size and
  * interval size. I mean, do we really need to plot from -11 to 11 for a 
  * -1 -> 1 window with a resolution of 1? */
@@ -187,6 +189,21 @@ void drawDot(double x, double y) {
 	glPointSize(9);
 	glBegin(GL_POINTS);
 		glVertex2f(plot_MapXCoordinate(x), plot_MapYCoordinate(y));
+	glEnd();
+	SDL_GL_SwapBuffers();
+}
+
+void drawDots(double *x, double *y, int count) {
+	if(plot_CheckState() != 0)
+		return;
+	if(count <= 0)
+		return;
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glPointSize(9);
+	glBegin(GL_POINTS);
+	for(--count; count >= 0; --count)
+		glVertex2f(plot_MapXCoordinate(x[count]), plot_MapYCoordinate(y[count]));
 	glEnd();
 	SDL_GL_SwapBuffers();
 }

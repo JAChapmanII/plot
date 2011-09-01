@@ -12,7 +12,9 @@ void resetPlot();
 void drawAxes();
 
 void plot_fYofX(fYofX f);
+
 void drawDot(double x, double y);
+void drawDots(double *x, double *y, int count);
 
 Interval getYInterval_fYofX(fYofX f);
 
