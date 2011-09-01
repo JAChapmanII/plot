@@ -13,29 +13,24 @@ int main(int argc, char **argv) {
 	setPlotYInterval(0.0, 25.0);
 
 	setPlotResolution(1);
-	clearPlot();
-	drawAxes();
 	plot_fYofX(f1);
 	pause();
 
 	printf("res: 0.5\n");
 	setPlotResolution(0.5);
-	clearPlot();
-	drawAxes();
+	resetPlot();
 	plot_fYofX(f1);
 	pause();
 
 	printf("res: 0.1\n");
 	setPlotResolution(0.1);
-	clearPlot();
-	drawAxes();
+	resetPlot();
 	plot_fYofX(f1);
 	pause();
 
 	printf("res: 0.01\n");
 	setPlotResolution(0.01);
-	clearPlot();
-	drawAxes();
+	resetPlot();
 	plot_fYofX(f1);
 	pause();
 
@@ -44,16 +39,14 @@ int main(int argc, char **argv) {
 	setPlotYInterval(0.0, 1.0);
 
 	setPlotResolution(0.01);
-	clearPlot();
-	drawAxes();
 	plot_fYofX(f1);
 
 	x[0] = 0; y[0] = 0;
 	for(n = 0; n < 13; ++n) {
 		x[n+1] = n * h;
 		y[n+1] = y[n] + h * 2 * x[n];
-		drawDot(x[n], y[n]);
 	}
+	drawDots(x, y, 13);
 	pause();
 
 	return 0;
