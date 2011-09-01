@@ -8,6 +8,7 @@ typedef struct {
 typedef double(*fYofX)(double);
 
 void clearPlot();
+void resetPlot();
 void drawAxes();
 
 void plot_fYofX(fYofX f);

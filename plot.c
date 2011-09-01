@@ -21,8 +21,13 @@ double plot_Resolution = 1;
 double plot_Overflow = 10;
 Interval plot_XInterval = { -10, 10 };
 Interval plot_YInterval = { -10, 10 };
+double plot_XLength = 20, plot_YLength = 20;
 
-enum PlotState { PS_NINIT, PS_NRSIZE, PS_GOOD, PS_FAIL } plot_State;
+enum PlotState {
+	PS_NINIT,
+	PS_NWRSIZE, PS_NPRSIZE,
+	PS_GOOD, PS_FAIL
+} plot_State;
 
 SDL_Surface *plot_Screen;
 
@@ -66,14 +71,15 @@ int plot_Init() {
 	/* initialize OpenGL */
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-	if(plot_Resize() != 0)
+	if(plot_WindowResize() != 0)
 		return 1;
 
+	plot_State = PS_GOOD;
 	return 0;
 }
 
 /* TODO change this to have 0,0 in the center? */
-int plot_Resize() {
+int plot_WindowResize() {
 	double ratio = plot_Width / plot_Height;
 
 	glViewport(0, 0, plot_Width, plot_Height);
@@ -86,15 +92,31 @@ int plot_Resize() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	plot_State = PS_GOOD;
 	return 0;
+}
+
+int plot_PlotResize() {
+	if(plot_CheckState() != 0)
+		return;
+
+	clearPlot();
+	drawAxes();
+	return 0;
+}
+
+void resetPlot() {
+	plot_PlotResize();
 }
 
 int plot_CheckState() {
 	switch(plot_State) {
 		case PS_NINIT:
-			return plot_Init();
-		case PS_NRSIZE:
-			return plot_Resize();
+			plot_Init();
+			return plot_CheckState();
+		case PS_NWRSIZE:
+			plot_WindowResize();
+			return plot_CheckState();
 		case PS_GOOD:
 			return 0;
 		case PS_FAIL: default:
@@ -103,11 +125,15 @@ int plot_CheckState() {
 }
 
 void clearPlot() {
-	if(plot_CheckState() != 0)
-		return;
+	plot_CheckState();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+}
+
+double plot_MapXCoordinate(double actualX) {
+}
+double plot_MapYCoordinate(double actualY) {
 }
 
 void drawAxes() { /* {{{ */
@@ -231,12 +257,22 @@ void setPlotDimensions(int pWidth, int pHeight) {
 	plot_Height = pHeight;
 }
 void setPlotXInterval(double start, double end) {
+	/* TODO: reverse? */
+	if(start > end)
+		return;
 	plot_XInterval.start = start;
 	plot_XInterval.end = end;
+	plot_XLength = end - start;
+	resetPlot();
 }
 void setPlotYInterval(double start, double end) {
+	/* TODO: reverse? */
+	if(start > end)
+		return;
 	plot_YInterval.start = start;
 	plot_YInterval.end = end;
+	plot_YLength = end - start;
+	resetPlot();
 }
 
 int getPlotWidth() {
