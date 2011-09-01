@@ -110,41 +110,41 @@ void clearPlot() {
 	glLoadIdentity();
 }
 
-void drawAxes(Interval xInterval, Interval yInterval) { /* {{{ */
-	double xLen = xInterval.end - xInterval.start,
-			yLen = yInterval.end - yInterval.start;
+void drawAxes() { /* {{{ */
+	double xLen = plot_XInterval.end - plot_XInterval.start,
+			yLen = plot_YInterval.end - plot_YInterval.start;
 	glColor3f(0.2f, 0.2f, 0.8f);
 	glBegin(GL_LINES);
 
 	/* x axis */
-	glVertex2f(xInterval.end / xLen * plot_Width, 0);
-	glVertex2f(xInterval.end / xLen * plot_Width, plot_Height);
+	glVertex2f(plot_XInterval.end / xLen * plot_Width, 0);
+	glVertex2f(plot_XInterval.end / xLen * plot_Width, plot_Height);
 
 	/* y axis */
-	glVertex2f(0, -yInterval.start / yLen * plot_Height);
-	glVertex2f(plot_Width, -yInterval.start / yLen * plot_Height);
+	glVertex2f(0, -plot_YInterval.start / yLen * plot_Height);
+	glVertex2f(plot_Width, -plot_YInterval.start / yLen * plot_Height);
 
 	glEnd();
 } /* }}} */
 
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
-void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval) {
+void plot_fYofX(fYofX f) {
 	double x, y, xLen, yLen, rStart, rEnd;
 	if(plot_CheckState() != 0)
 		return;
 
-	xLen = xInterval.end - xInterval.start;
-	yLen = yInterval.end - yInterval.start;
+	xLen = plot_XInterval.end - plot_XInterval.start;
+	yLen = plot_YInterval.end - plot_YInterval.start;
 
 	/*
-	rStart = (xInterval.start + xLen / 2) - (plot_Resolution / 2) -
+	rStart = (plot_XInterval.start + xLen / 2) - (plot_Resolution / 2) -
 		(xLen / plot_Resolution / 2);
-	rEnd = (xInterval.start + xLen / 2) + (plot_Resolution / 2) +
+	rEnd = (plot_XInterval.start + xLen / 2) + (plot_Resolution / 2) +
 		(xLen / plot_Resolution / 2);
 	*/
-	rStart = xInterval.start - plot_Overflow;
-	rEnd = xInterval.end + plot_Overflow;
+	rStart = plot_XInterval.start - plot_Overflow;
+	rEnd = plot_XInterval.end + plot_Overflow;
 
 	x = rStart;
 
@@ -153,67 +153,67 @@ void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval) {
 	while(x < rEnd) {
 		y = f(x);
 		/* TODO could this addressing be better? */
-		glVertex2f((x - xInterval.start) / xLen * plot_Width,
-				(y - yInterval.start) / yLen * plot_Height);
+		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
+				(y - plot_YInterval.start) / yLen * plot_Height);
 		x += plot_Resolution;
 	}
 	glEnd();
 	SDL_GL_SwapBuffers();
 }
 
-void drawDot(double x, double y, Interval xInterval, Interval yInterval) {
+void drawDot(double x, double y) {
 	double xLen, yLen;
 	if(plot_CheckState() != 0)
 		return;
-	xLen = xInterval.end - xInterval.start;
-	yLen = yInterval.end - yInterval.start;
+	xLen = plot_XInterval.end - plot_XInterval.start;
+	yLen = plot_YInterval.end - plot_YInterval.start;
 
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glPointSize(9);
 	glBegin(GL_POINTS);
 	/*glBegin(GL_LINE_STRIP);*/
-		glVertex2f((x - xInterval.start) / xLen * plot_Width,
-				(y - yInterval.start) / yLen * plot_Height);
+		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
+				(y - plot_YInterval.start) / yLen * plot_Height);
 		/*
-		glVertex2f((x - 0.02 - xInterval.start) / xLen * plot_Width,
-				(y - yInterval.start) / yLen * plot_Height);
-		glVertex2f((x - xInterval.start) / xLen * plot_Width,
-				(y + 0.02 - yInterval.start) / yLen * plot_Height);
-		glVertex2f((x + 0.02 - xInterval.start) / xLen * plot_Width,
-				(y - yInterval.start) / yLen * plot_Height);
-		glVertex2f((x - xInterval.start) / xLen * plot_Width,
-				(y - 0.02 - yInterval.start) / yLen * plot_Height);
+		glVertex2f((x - 0.02 - plot_XInterval.start) / xLen * plot_Width,
+				(y - plot_YInterval.start) / yLen * plot_Height);
+		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
+				(y + 0.02 - plot_YInterval.start) / yLen * plot_Height);
+		glVertex2f((x + 0.02 - plot_XInterval.start) / xLen * plot_Width,
+				(y - plot_YInterval.start) / yLen * plot_Height);
+		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
+				(y - 0.02 - plot_YInterval.start) / yLen * plot_Height);
 				*/
 	glEnd();
 	SDL_GL_SwapBuffers();
 }
 
-/* Calculate and return an appropriate yInterval for some function f over a
+/* Calculate and return an appropriate plot_YInterval for some function f over a
  * particular x interval */
-Interval getYInterval_fYofX(fYofX f, Interval xInterval) { /* {{{ */
-	Interval yInterval = { DBL_MAX, -DBL_MAX };
+Interval getYInterval_fYofX(fYofX f) { /* {{{ */
+	Interval plot_YInterval = { DBL_MAX, -DBL_MAX };
 	double x, y;
 
-	xInterval.start -= plot_Overflow;
-	xInterval.end += plot_Overflow;
+	plot_XInterval.start -= plot_Overflow;
+	plot_XInterval.end += plot_Overflow;
 
-	x = xInterval.start;
-	while(x < xInterval.end) {
+	x = plot_XInterval.start;
+	while(x < plot_XInterval.end) {
 		y = f(x);
 		/*printf("f(%.4f): %.16f\n", x, y);*/
-		if(y < yInterval.start)
-			yInterval.start = y;
-		if(y > yInterval.end)
-			yInterval.end = y;
+		if(y < plot_YInterval.start)
+			plot_YInterval.start = y;
+		if(y > plot_YInterval.end)
+			plot_YInterval.end = y;
 		x += plot_Resolution;
 	}
 	/* TODO: this expansion fails for 0, and when min = max */
-	yInterval.start *= 1.1;
-	yInterval.end *= 1.1;
+	plot_YInterval.start *= 1.1;
+	plot_YInterval.end *= 1.1;
 	/*ylen = max - min;
 	printf("ylen: [%f, %f]\n", min, max);*/
 
-	return yInterval;
+	return plot_YInterval;
 } /* }}} */
 
 /* Plot dimension (width, height, resolution setters and getters {{{ */
@@ -232,11 +232,11 @@ void setPlotDimensions(int pWidth, int pHeight) {
 }
 void setPlotXInterval(double start, double end) {
 	plot_XInterval.start = start;
-	plot_XInterval.start = end;
+	plot_XInterval.end = end;
 }
 void setPlotYInterval(double start, double end) {
 	plot_YInterval.start = start;
-	plot_YInterval.start = end;
+	plot_YInterval.end = end;
 }
 
 int getPlotWidth() {

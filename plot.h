@@ -8,11 +8,12 @@ typedef struct {
 typedef double(*fYofX)(double);
 
 void clearPlot();
-void drawAxes(Interval xInterval, Interval yInterval);
+void drawAxes();
 
-void plot_fYofX(fYofX f, Interval xInterval, Interval yInterval);
+void plot_fYofX(fYofX f);
+void drawDot(double x, double y);
 
-Interval getYInterval_fYofX(fYofX f, Interval xInterval);
+Interval getYInterval_fYofX(fYofX f);
 
 void setPlotWidth(int pWidth);
 void setPlotHeight(int pHeight);
@@ -30,7 +31,5 @@ double getPlotResolution();
 
 void plotDelay(int time);
 void pause();
-
-void drawDot(double x, double y, Interval xInterval, Interval yInterval);
 
 #endif /* PLOT_H */
