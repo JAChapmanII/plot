@@ -132,8 +132,10 @@ void clearPlot() {
 }
 
 double plot_MapXCoordinate(double actualX) {
+	return (actualX - plot_XInterval.start) / plot_XLength * plot_Width;
 }
 double plot_MapYCoordinate(double actualY) {
+	return (actualY - plot_YInterval.start) / plot_YLength * plot_Height;
 }
 
 void drawAxes() { /* {{{ */
@@ -156,19 +158,10 @@ void drawAxes() { /* {{{ */
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
 void plot_fYofX(fYofX f) {
-	double x, y, xLen, yLen, rStart, rEnd;
+	double x, y, rStart, rEnd;
 	if(plot_CheckState() != 0)
 		return;
 
-	xLen = plot_XInterval.end - plot_XInterval.start;
-	yLen = plot_YInterval.end - plot_YInterval.start;
-
-	/*
-	rStart = (plot_XInterval.start + xLen / 2) - (plot_Resolution / 2) -
-		(xLen / plot_Resolution / 2);
-	rEnd = (plot_XInterval.start + xLen / 2) + (plot_Resolution / 2) +
-		(xLen / plot_Resolution / 2);
-	*/
 	rStart = plot_XInterval.start - plot_Overflow;
 	rEnd = plot_XInterval.end + plot_Overflow;
 
@@ -178,9 +171,8 @@ void plot_fYofX(fYofX f) {
 	glColor3f(0.0f, 0.0f, 0.0f);
 	while(x < rEnd) {
 		y = f(x);
-		/* TODO could this addressing be better? */
-		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
-				(y - plot_YInterval.start) / yLen * plot_Height);
+		glVertex2f(plot_MapXCoordinate(x), plot_MapYCoordinate(y));
+		/* TODO: multiply instead? */
 		x += plot_Resolution;
 	}
 	glEnd();
@@ -188,28 +180,13 @@ void plot_fYofX(fYofX f) {
 }
 
 void drawDot(double x, double y) {
-	double xLen, yLen;
 	if(plot_CheckState() != 0)
 		return;
-	xLen = plot_XInterval.end - plot_XInterval.start;
-	yLen = plot_YInterval.end - plot_YInterval.start;
 
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glPointSize(9);
 	glBegin(GL_POINTS);
-	/*glBegin(GL_LINE_STRIP);*/
-		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
-				(y - plot_YInterval.start) / yLen * plot_Height);
-		/*
-		glVertex2f((x - 0.02 - plot_XInterval.start) / xLen * plot_Width,
-				(y - plot_YInterval.start) / yLen * plot_Height);
-		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
-				(y + 0.02 - plot_YInterval.start) / yLen * plot_Height);
-		glVertex2f((x + 0.02 - plot_XInterval.start) / xLen * plot_Width,
-				(y - plot_YInterval.start) / yLen * plot_Height);
-		glVertex2f((x - plot_XInterval.start) / xLen * plot_Width,
-				(y - 0.02 - plot_YInterval.start) / yLen * plot_Height);
-				*/
+		glVertex2f(plot_MapXCoordinate(x), plot_MapYCoordinate(y));
 	glEnd();
 	SDL_GL_SwapBuffers();
 }
