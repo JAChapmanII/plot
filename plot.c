@@ -204,34 +204,34 @@ void drawDots(double *x, double *y, int count) { /* {{{ */
 		glVertex2f(plot_MapXCoordinate(x[count]), plot_MapYCoordinate(y[count]));
 	glEnd();
 	SDL_GL_SwapBuffers();
-}
+} /* }}} */
 
 /* Calculate and return an appropriate plot_YInterval for some function f over a
  * particular x interval */
 Interval getYInterval_fYofX(fYofX f) { /* {{{ */
-	Interval plot_YInterval = { DBL_MAX, -DBL_MAX };
+	Interval yInterval = { DBL_MAX, -DBL_MAX }, xInterval;
 	double x, y;
 
-	plot_XInterval.start -= plot_Overflow;
-	plot_XInterval.end += plot_Overflow;
+	xInterval.start = plot_XInterval.start - plot_Overflow;
+	xInterval.end = plot_XInterval.end + plot_Overflow;
 
-	x = plot_XInterval.start;
-	while(x < plot_XInterval.end) {
+	x = xInterval.start;
+	while(x < xInterval.end) {
 		y = f(x);
 		/*printf("f(%.4f): %.16f\n", x, y);*/
-		if(y < plot_YInterval.start)
-			plot_YInterval.start = y;
-		if(y > plot_YInterval.end)
-			plot_YInterval.end = y;
+		if(y < yInterval.start)
+			yInterval.start = y;
+		if(y > yInterval.end)
+			yInterval.end = y;
 		x += plot_Resolution;
 	}
 	/* TODO: this expansion fails for 0, and when min = max */
-	plot_YInterval.start *= 1.1;
-	plot_YInterval.end *= 1.1;
+	yInterval.start *= 1.1;
+	yInterval.end *= 1.1;
 	/*ylen = max - min;
 	printf("ylen: [%f, %f]\n", min, max);*/
 
-	return plot_YInterval;
+	return yInterval;
 } /* }}} */
 
 /* Plot dimension (width, height, resolution setters and getters {{{ */
