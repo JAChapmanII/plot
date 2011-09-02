@@ -19,6 +19,7 @@
 
 int plot_Width = 800;
 int plot_Height = 600;
+int plot_WriteTicks = 0;
 double plot_Resolution = 1;
 double plot_Overflow = 10;
 Interval plot_XInterval = { -10, 10 };
@@ -141,18 +142,16 @@ double plot_MapYCoordinate(double actualY) {
 }
 
 void drawAxes() { /* {{{ */
-	double xLen = plot_XInterval.end - plot_XInterval.start,
-			yLen = plot_YInterval.end - plot_YInterval.start;
 	glColor3f(0.2f, 0.2f, 0.8f);
 	glBegin(GL_LINES);
 
 	/* x axis */
-	glVertex2f(plot_XInterval.end / xLen * plot_Width, 0);
-	glVertex2f(plot_XInterval.end / xLen * plot_Width, plot_Height);
+	glVertex2f(plot_MapXCoordinate(plot_XInterval.start), plot_MapYCoordinate(0));
+	glVertex2f(plot_MapXCoordinate(plot_XInterval.end), plot_MapYCoordinate(0));
 
 	/* y axis */
-	glVertex2f(0, -plot_YInterval.start / yLen * plot_Height);
-	glVertex2f(plot_Width, -plot_YInterval.start / yLen * plot_Height);
+	glVertex2f(plot_MapXCoordinate(0), plot_MapYCoordinate(plot_YInterval.start));
+	glVertex2f(plot_MapXCoordinate(0), plot_MapYCoordinate(plot_YInterval.end));
 
 	glEnd();
 } /* }}} */
@@ -181,7 +180,7 @@ void plot_fYofX(fYofX f) {
 	SDL_GL_SwapBuffers();
 }
 
-void drawDot(double x, double y) {
+void drawDot(double x, double y) { /* {{{ */
 	if(plot_CheckState() != 0)
 		return;
 
@@ -191,9 +190,8 @@ void drawDot(double x, double y) {
 		glVertex2f(plot_MapXCoordinate(x), plot_MapYCoordinate(y));
 	glEnd();
 	SDL_GL_SwapBuffers();
-}
-
-void drawDots(double *x, double *y, int count) {
+} /* }}} */
+void drawDots(double *x, double *y, int count) { /* {{{ */
 	if(plot_CheckState() != 0)
 		return;
 	if(count <= 0)
@@ -294,6 +292,13 @@ Interval getYInterval() {
 	return plot_YInterval;
 }
 /* }}} */
+
+void setWriteTicks(int pWriteTicks) {
+	plot_WriteTicks = pWriteTicks;
+}
+int getWriteTicks() {
+	return plot_WriteTicks;
+}
 
 void plotDelay(int time) {
 	SDL_Delay(time);

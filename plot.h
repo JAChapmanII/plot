@@ -32,6 +32,9 @@ Interval getYInterval();
 void setPlotResolution(double pResolution);
 double getPlotResolution();
 
+void setWriteTicks(int pWriteTicks);
+int getWriteTicks();
+
 void plotDelay(int time);
 void pause();
 
