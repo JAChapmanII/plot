@@ -5,9 +5,20 @@ double f1(double x) {
 	return x*x;
 }
 
+double f(double x) {
+	return (x + 3) / (x*x + 5);
+}
+
 int main(int argc, char **argv) {
 	int n;
 	double x[13], y[13], h = 0.1;
+
+	setPlotXInterval(-5.0, 5);
+	setPlotYInterval(getYInterval_fYofX(f).start, getYInterval_fYofX(f).end);
+
+	setPlotResolution(1);
+	plot_fYofX(f);
+	pause();
 
 	setPlotXInterval(0.0, 5.0);
 	setPlotYInterval(0.0, 25.0);
