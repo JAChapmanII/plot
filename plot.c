@@ -15,13 +15,13 @@
  * -1 -> 1 window with a resolution of 1? */
 /* We multiply this number by the plot resolution, then graph that much more
  * off the left and right ends of the x interval */
-#define PLOT_OVERFLOW 10
+#define PLOT_OVERFLOW 0.5
 
 int plot_Width = 800;
 int plot_Height = 600;
 int plot_WriteTicks = 0;
 double plot_Resolution = 1;
-double plot_Overflow = 10;
+double plot_Overflow = 0.5;
 Interval plot_XInterval = { -10, 10 };
 Interval plot_YInterval = { -10, 10 };
 double plot_XLength = 20, plot_YLength = 20;
@@ -173,14 +173,12 @@ void drawAxes() { /* {{{ */
 /* TODO a lot of this will be needed for all the plot_f* functions, so we
  * should try to get this split up better */
 void plot_fYofX(fYofX f) {
-	double x, y, rStart, rEnd;
+	double x, y, rEnd;
 	if(plot_CheckState() != 0)
 		return;
 
-	rStart = plot_XInterval.start - plot_Overflow;
-	rEnd = plot_XInterval.end + plot_Overflow;
-
-	x = rStart;
+	x = plot_XInterval.start;
+	rEnd = plot_XInterval.end + 2*plot_Overflow;
 
 	glBegin(GL_LINE_STRIP);
 	glColor3f(0.0f, 0.0f, 0.0f);
