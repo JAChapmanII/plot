@@ -13,6 +13,7 @@ int main(int argc, char **argv) {
 	int n;
 	double x[13], y[13], h = 0.1;
 
+	setWriteTicks(1);
 	setPlotXInterval(-5.0, 5);
 	setPlotYInterval(getYInterval_fYofX(f).start, getYInterval_fYofX(f).end);
 
