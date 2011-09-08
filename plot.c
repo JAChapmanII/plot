@@ -25,6 +25,8 @@ double plot_Overflow = 10;
 Interval plot_XInterval = { -10, 10 };
 Interval plot_YInterval = { -10, 10 };
 double plot_XLength = 20, plot_YLength = 20;
+int plot_TextHeight = 16;
+int plot_TextWidth  = 10;
 
 enum PlotState {
 	PS_NINIT,
@@ -135,10 +137,22 @@ void clearPlot() {
 }
 
 double plot_MapXCoordinate(double actualX) {
-	return (actualX - plot_XInterval.start) / plot_XLength * plot_Width;
+	if(!plot_WriteTicks)
+		return (actualX - plot_XInterval.start) / plot_XLength * plot_Width;
+	else
+		/* TODO: change this so that the axes can be on the correct side (look
+		 * at quadrant that the plot is actually in */
+		return (actualX - plot_XInterval.start) / plot_XLength *
+			(plot_Width - 3*plot_TextWidth) + 3*plot_TextWidth;
 }
 double plot_MapYCoordinate(double actualY) {
-	return (actualY - plot_YInterval.start) / plot_YLength * plot_Height;
+	if(!plot_WriteTicks)
+		return (actualY - plot_YInterval.start) / plot_YLength * plot_Height;
+	else
+		/* TODO: change this so that the axes can be on the correct side (look
+		 * at quadrant that the plot is actually in */
+		return (actualY - plot_YInterval.start) / plot_YLength *
+			(plot_Height - plot_TextHeight) + plot_TextHeight;
 }
 
 void drawAxes() { /* {{{ */
